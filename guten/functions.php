@@ -585,3 +585,26 @@ function guten_set_widget_categories_dropdown_arg($args){
 	return $args;
 }
 add_filter( 'widget_categories_dropdown_args', 'guten_set_widget_categories_dropdown_arg' );
+
+// added to increase default session timeout for dashboard logins
+add_filter('auth_cookie_expiration', 'my_expiration_filter', 99, 3);
+
+function my_expiration_filter($seconds, $user_id, $remember){
+
+    //if "remember me" is checked;
+    if ( $remember ) {
+        //WP defaults to 2 weeks;
+        $expiration = 14*24*60*60; //UPDATE HERE;
+    } else {
+        //WP defaults to 48 hrs/2 days;
+        $expiration = 2*24*60*60; //UPDATE HERE;
+    }
+
+    //http://en.wikipedia.org/wiki/Year_2038_problem
+    if ( PHP_INT_MAX - time() < $expiration ) {
+        //Fix to a little bit earlier!
+        $expiration =  PHP_INT_MAX - time() - 5;
+    }
+
+    return $expiration;
+}
